@@ -3,6 +3,8 @@
 const debounce = require('lodash.debounce');
 const chokidar = require('chokidar');
 const program = require('caporal');
+const fs = require('fs');
+const { spawn } = require('child_process');
 
 program
   .version('0.0.1')
@@ -12,19 +14,20 @@ program
 
     try {
       await fs.promises.access(name);
-    } catch (error) {
+    } catch (err) {
       throw new Error(`File ${name} does not exist`);
     }
 
     const start = debounce(() => {
-      console.log('STARTING USERS PROGRAM');
+      console.log('Starting...');
+      spawn('node', [name], { stdio: 'inherit' });
     }, 100);
 
     chokidar
       .watch('.')
       .on('add', start)
-      .on('change', () => start)
-      .on('unlink', () => start);
+      .on('change', start)
+      .on('unlink', start);
   });
 
 program.parse(process.argv);
