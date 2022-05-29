@@ -17,10 +17,13 @@ program
     } catch (err) {
       throw new Error(`File ${name} does not exist`);
     }
-
+    let proc;
     const start = debounce(() => {
+      if (proc) {
+        proc.kill();
+      }
       console.log('Starting...');
-      spawn('node', [name], { stdio: 'inherit' });
+      proc = spawn('node', [name], { stdio: 'inherit' });
     }, 100);
 
     chokidar
